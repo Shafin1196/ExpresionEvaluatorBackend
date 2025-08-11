@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'expresionApi',
     'rest_framework',
-    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -78,11 +77,17 @@ WSGI_APPLICATION = 'api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'shafin714$default',      # Replace with your DB name
+        'USER': 'shafin714',           # Replace with your MySQL username
+        'PASSWORD': '10772112A',       # Replace with your MySQL password
+        'HOST': 'shafin714.mysql.pythonanywhere-services.com',               # Or your DB server IP
+        'PORT': '3306',                     # Default MySQL port
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
