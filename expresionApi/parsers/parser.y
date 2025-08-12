@@ -1,63 +1,65 @@
 %{
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
-#include <math.h>   /* pow() */
-
-int yylex(void);
 void yyerror(const char *s);
+int yylex(void);
+
+double result;
 %}
 
 %union {
-    long long val;
+    double dval;
 }
 
-%token <val> NUMBER
+%token <dval> NUMBER
+
 %left '+' '-'
 %left '*' '/'
-%right '^'           /* right-associative power */
+%right POWER
 %right UMINUS
 
-%type <val> expr
+%type <dval> expr
 
 %%
 
 input:
     /* empty */
-  | lines
-  ;
-
-lines:
-    lines line
-  | /* empty */
+  | input line
   ;
 
 line:
-    expr '\n'   { printf("%lld\n", $1); }
-  | '\n'
+    '\n'
+  | expr '\n'   {
+                    result = $1;
+                    printf("%lf\n", result);
+                }
   ;
 
 expr:
-    NUMBER               { $$ = $1; }
-  | expr '+' expr        { $$ = $1 + $3; }
-  | expr '-' expr        { $$ = $1 - $3; }
-  | expr '*' expr        { $$ = $1 * $3; }
-  | expr '/' expr        {
-                            if ($3 == 0) {
-                                fprintf(stderr, "error: division by zero\n");
-                                exit(1);
-                            }
-                            $$ = $1 / $3;
-                         }
-  | expr '^' expr        { $$ = (long long) pow((double)$1, (double)$3); }
-  | '-' expr %prec UMINUS { $$ = -$2; }
-  | '(' expr ')'         { $$ = $2; }
+    NUMBER                      { $$ = $1; }
+  | expr '+' expr               { $$ = $1 + $3; }
+  | expr '-' expr               { $$ = $1 - $3; }
+  | expr '*' expr               { $$ = $1 * $3; }
+  | expr '/' expr               {
+                                     if ($3 == 0) {
+                                     fprintf(stderr, "error: division by zero\n");
+                                     exit(1);
+                                }
+                                $$ = $1 / $3;
+                                }
+  | expr POWER expr             { $$ = pow($1, $3); }
+  | '-' expr %prec UMINUS       { $$ = -$2; }
+  | '(' expr ')'                { $$ = $2; }
   ;
+
 %%
 
 void yyerror(const char *s) {
-    fprintf(stderr, "syntax error\n");
+    fprintf(stderr, "Error: %s\n", s);
 }
 
 int main(void) {
-    return yyparse();
+    yyparse();
+    return 0;
 }

@@ -1,31 +1,26 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
 #include "parser.tab.h"
+#include <stdlib.h>
 %}
 
-DIGIT   [0-9]
+digit   [0-9]
+number  {digit}+(\.{digit}+)?([eE][-+]?{digit}+)?
 
 %%
-
-[ \t\r]+            { /* skip spaces */ }
-\n                  { return '\n'; }
-
-{DIGIT}+            {
-                        yylval.val = atoll(yytext);
-                        return NUMBER;
-                    }
-
-"("                 { return '('; }
-")"                 { return ')'; }
-"*"                 { return '*'; }
-"/"                 { return '/'; }
-"+"                 { return '+'; }
-"-"                 { return '-'; }
-"^"                 { return '^'; }
-
-.                   { /* ignore unknown */ }
+[ \t]+                  ;   // ignore whitespace
+{number}                {
+                            yylval.dval = atof(yytext);
+                            return NUMBER;
+                        }
+"^"                     return POWER;
+"+"                     return '+';
+"-"                     return '-';
+"*"                     return '*';
+"/"                     return '/';
+"("                     return '(';
+")"                     return ')';
+\n                      return '\n';
+.                       return yytext[0];
 
 %%
-
 int yywrap(void) { return 1; }
