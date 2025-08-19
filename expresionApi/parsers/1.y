@@ -60,12 +60,22 @@ term: term '*' factor {
 factor: ID   { strcpy($$, $1); }
       | NUM  { strcpy($$, $1); }
       | '(' expr ')' { strcpy($$, $2); }
+      | '-' factor {
+            char temp[10];
+            sprintf(temp, "t%d", tempCount++);
+            gen(temp, $2, "-", NULL); // t = -s
+            strcpy($$, temp);
+        }
       ;
 
 %%
 
 void gen(char* res, char* op1, char* op, char* op2) {
-    printf("%s = %s %s %s\n", res, op1, op, op2);
+    if (op2 == NULL && strcmp(op, "-") == 0) {
+        printf("%s = -%s\n", res, op1);
+    } else {
+        printf("%s = %s %s %s\n", res, op1, op, op2);
+    }
 }
 
 int main() {
